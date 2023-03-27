@@ -6,4 +6,6 @@ I've got a few Raspberry Pi(e)s scattered around the house (webcam, pihole, etc.
 
 So, obviously, I had to roll my own, and here you go. The only commandline switch is `-d` which will start the script in "daemon" mode, listening to HTTP requests on port 8000. Otherwise, you get the output directly on the console. As a little extra, if you poll the script remotely with `curl`, you will also get nicely coloured console output instead of HTML (which is otherwise the default for browsers).
 
+For a quick install on any Pi, run `wget https://github.com/floe/nanosysinfo/raw/main/nanosysinfo.py`
+
 And yes, I know you shouldn't screenscrape `apt` or `ping`, and `iwconfig` is deprecated. Yeah well. 🤷
