@@ -100,6 +100,7 @@ class mysysinfo:
         # volts
         volts = ""
         try:
+            # TODO: include vcgencmd get_throttled
             tmp = sanitize(check_output(["vcgencmd","measure_volts","core"]))
             val = float(tmp.split("=")[1].strip("V"))
             volts = f", {self.fancy.green}{val} V{self.fancy.reset}"
@@ -167,13 +168,13 @@ class mysysinfo:
         ping = f"Ping to {target}: {netcol}{recv}/{sent}{self.fancy.reset} packets received, avg. RTT {self.fancy.green}{avg} ms{self.fancy.reset}"
         result += self.fancy_output("Network",ping)
 
-        # DNS?
+        # TODO DNS?
         #dig +short google.com
 
         # separator
         result += separator()
 
-        # apt list --upgradable (with socat to simulate terminal)
+        # apt list --upgradable
         updates = sanitize(check_output(["apt","list","--upgradable"],stderr=STDOUT))
         updates = "\n".join([ x for x in updates.split("\n") if "/" in x ])
         if len(updates) == 0:
@@ -189,11 +190,12 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def _html(self):
+        # TODO add meta refresh?
         header = f"<html><head><meta charset='UTF-8'/><style>body{{background-color:black;color:gray;}}</style><title>{os.uname().nodename} nanosysinfo</title></head><body><pre>\n"
         footer = "</pre></body></html>"
         inner = mysysinfo(html).create_info()
         content = header+inner+footer
-        return content.encode("utf8")  # NOTE: must return a bytes object!
+        return content.encode("utf8")
 
     def _plain(self):
         content = mysysinfo(ansi).create_info()
