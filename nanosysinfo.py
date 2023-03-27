@@ -109,15 +109,12 @@ class mysysinfo:
         # cpu
         freq = round(float(dump_file("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")) / 1000,1)
         temp = round(float(dump_file("/sys/class/thermal/thermal_zone0/temp")) / 1000,1)
+        #temp = psutil.sensors_temperatures()
         cores = psutil.cpu_count()
         loadavg = round(psutil.getloadavg()[0]/cores * 100,1)
         cpucol = self.percent_to_color(loadavg)
         cpuinfo = f"load average: {cpucol}{loadavg}%{self.fancy.reset} ({cores} core(s), {self.fancy.green}{freq} MHz{self.fancy.reset}, {self.fancy.green}{temp} °C{self.fancy.reset}{volts})"
         result += self.fancy_output("CPU",cpuinfo)
-
-        # temp
-        #temp = psutil.sensors_temperatures()
-        #fancy_output("CPU Temp",str(temp))
 
         # ram
         memory = psutil.virtual_memory() # Convert Bytes to MB (Bytes -> KB -> MB)
@@ -146,6 +143,15 @@ class mysysinfo:
         else:
             wifi = f"{self.fancy.yellow}Not connected.{self.fancy.reset}"
         result += self.fancy_output("WiFi",wifi)
+
+        # ethernet
+        ifs = psutil.net_if_stats()
+        ethernet = f"{self.fancy.yellow}Not connected.{self.fancy.reset}"
+        for name,port in ifs.items():
+            if port.isup and port.duplex != psutil.NIC_DUPLEX_UNKNOWN:
+                ethernet = f"Connected with {self.fancy.green}{port.speed} MB/s{self.fancy.reset}."
+                break
+        result += self.fancy_output("Ethernet",ethernet)
 
         # ping
         target = "8.8.8.8"
