@@ -1,10 +1,12 @@
+# nanosysinfo systemd service
+# put this into ~/.config/systemd/user/
+# don't forget loginctl enable-linger username
+
 [Unit]
 Description=Nano System Information
 
 [Service]
-ExecStart=%h/nanosysinfo.py
+ExecStart=%h/nanosysinfo.py -d
 
 [Install]
 WantedBy=default.target
-
-# don't forget loginctl enable-linger username
