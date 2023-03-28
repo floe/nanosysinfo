@@ -1,0 +1,10 @@
+[Unit]
+Description=Nano System Information
+
+[Service]
+ExecStart=%h/nanosysinfo.py
+
+[Install]
+WantedBy=default.target
+
+# don't forget loginctl enable-linger username
