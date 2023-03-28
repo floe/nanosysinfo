@@ -1,6 +1,8 @@
 # nanosysinfo systemd service
-# put this into ~/.config/systemd/user/
-# don't forget loginctl enable-linger username
+# put this file into ~/.config/systemd/user/ and run:
+# loginctl enable-linger username
+# systemctl --user enable nanosysinfo.service
+# systemctl --user start nanosysinfo.service
 
 [Unit]
 Description=Nano System Information
