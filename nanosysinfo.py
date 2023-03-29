@@ -3,7 +3,7 @@
 # prerequisites: sudo apt install python3-psutil
 
 import psutil,time,sys,os
-from datetime import timedelta
+from datetime import timedelta,datetime
 from textwrap import indent
 from subprocess import check_output,STDOUT,run,PIPE
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -60,6 +60,7 @@ class mysysinfo:
         heading += ":"
         heading = f"{heading: <20}"
         heading += self.fancy.reset+self.fancy.reset
+        content = indent(content,"                    ").strip()
         return self.fancy.bold+self.fancy.white+heading+content+"\n"
 
     def percent_to_color(self,percent):
@@ -150,7 +151,7 @@ class mysysinfo:
         ethernet = f"{self.fancy.yellow}Not connected.{self.fancy.reset}"
         for name,port in ifs.items():
             if port.isup and port.duplex != psutil.NIC_DUPLEX_UNKNOWN:
-                ethernet = f"Connected with {self.fancy.green}{port.speed} MB/s{self.fancy.reset}."
+                ethernet = f"Connected with {self.fancy.green}{port.speed} Mb/s{self.fancy.reset}."
                 break
         result += self.fancy_output("Ethernet",ethernet)
 
@@ -178,8 +179,9 @@ class mysysinfo:
         updates = sanitize(check_output(["apt","list","--upgradable"],stderr=STDOUT))
         updates = "\n".join([ x for x in updates.split("\n") if "/" in x ])
         if len(updates) == 0:
-            updates = f"{self.fancy.yellow}None available.{self.fancy.reset}"
-        result += self.fancy_output("Updates",indent(updates,"                ").strip())
+            lastcheck = datetime.fromtimestamp(os.path.getmtime("/var/cache/apt/pkgcache.bin")).strftime("%Y-%m-%d %H:%M")
+            updates = f"{self.fancy.yellow}None available.{self.fancy.reset} (last checked: {lastcheck})"
+        result += self.fancy_output("Updates",updates)
 
         return result
 
