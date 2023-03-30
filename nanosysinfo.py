@@ -50,18 +50,21 @@ def sanitize(content):
         content = content.decode("utf-8")
     return content.strip()
 
+pierrors = { 0: "undervolted", 1: "frequency capped", 2: "throttled", 3: "soft thermal limit" }
 
 class mysysinfo:
 
     def __init__(self,format_helper):
         self.fancy = format_helper
 
-    def fancy_output(self,heading,content):
+    def fancy_output(self,heading,content,color=None):
+        if color == None:
+            color = self.fancy.white
         heading += ":"
         heading = f"{heading: <20}"
         heading += self.fancy.reset+self.fancy.reset
         content = indent(content,"                    ").strip()
-        return self.fancy.bold+self.fancy.white+heading+content+"\n"
+        return self.fancy.bold+color+heading+content+"\n"
 
     def percent_to_color(self,percent):
         if percent > 75:
@@ -100,11 +103,23 @@ class mysysinfo:
 
         # volts
         volts = ""
+        warn = ""
         try:
-            # TODO: include vcgencmd get_throttled
             tmp = sanitize(check_output(["vcgencmd","measure_volts","core"]))
             val = float(tmp.split("=")[1].strip("V"))
             volts = f", {self.fancy.green}{val} V{self.fancy.reset}"
+            tmp = sanitize(check_output(["vcgencmd","get_throttled"]))
+            val = int(tmp.split("x")[1],16)
+            for shift,label in { 0: "currently", 16: "earlier" }.items():
+                if val & (15 << shift):
+                    warn += label+": "+self.fancy.yellow
+                    for bit,flag in pierrors.items():
+                        if val & (1 << bit+shift):
+                            warn += flag+", "
+                    warn += self.fancy.reset
+            warn = warn.strip(", ")
+            if warn != "":
+                result += self.fancy_output("WARNINGS",warn,self.fancy.red)
         except:
             pass
 
