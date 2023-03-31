@@ -192,7 +192,13 @@ class mysysinfo:
 
         # apt list --upgradable
         updates = sanitize(check_output(["apt","list","--upgradable"],stderr=STDOUT))
-        updates = "\n".join([ x for x in updates.split("\n") if "/" in x ])
+        tmp = ""
+        for x in updates.split("\n"):
+            items = x.split("/",1)
+            if len(items) == 1:
+                continue
+            tmp += self.fancy.green+items[0]+self.fancy.reset+"/"+items[1]+"\n"
+        updates = tmp
         if len(updates) == 0:
             lastcheck = datetime.fromtimestamp(os.path.getmtime("/var/cache/apt/pkgcache.bin")).strftime("%Y-%m-%d %H:%M")
             updates = f"{self.fancy.yellow}None available.{self.fancy.reset} (last checked: {lastcheck})"
