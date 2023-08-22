@@ -155,7 +155,7 @@ class mysysinfo:
                 lq = line.split("=")[1].split(" ")[0]
                 percent = eval(lq)*100
                 linkcol = self.percent_to_color(100-percent)
-        if "essid" in locals():
+        if "essid" in locals() and essid != "off/any":
             wifi = f"Connected to {self.fancy.green}{essid}{self.fancy.reset}, bitrate {self.fancy.green}{bitrate}{self.fancy.reset}, link quality {linkcol}{lq}{self.fancy.reset}"
         else:
             wifi = f"{self.fancy.yellow}Not connected.{self.fancy.reset}"
