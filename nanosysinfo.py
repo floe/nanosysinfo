@@ -90,6 +90,10 @@ class mysysinfo:
         hostinfo = f"{self.fancy.green}{hostname}{self.fancy.reset}, running Linux {kernel} on {arch}"
         result += self.fancy_output("Hostinfo",hostinfo)
 
+        # distro
+        distro = {k:v.strip("\"\n ") for k,v in (l.split("=") for l in open("/etc/os-release"))}
+        result += self.fancy_output("Distribution",distro["NAME"]+" "+distro["VERSION"])
+
         # date
         updated = time.strftime("%Y-%m-%d %H:%M:%S")
         result += self.fancy_output("Updated",updated)
