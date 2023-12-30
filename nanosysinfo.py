@@ -191,6 +191,11 @@ class mysysinfo:
         # TODO DNS?
         #dig +short google.com
 
+        # log
+        result += separator()
+        log = sanitize(run(["journalctl","-n","10"],stdout=PIPE).stdout)
+        result += self.fancy_output("Journal",log)
+
         # separator
         result += separator()
 
