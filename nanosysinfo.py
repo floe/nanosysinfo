@@ -98,12 +98,12 @@ class mysysinfo:
         updated = time.strftime("%Y-%m-%d %H:%M:%S")
         result += self.fancy_output("Updated",updated)
 
+        # separator
+        result += separator()
+
         # uptime (could also use psutil.boot_time())
         uptime = round(float(dump_file("/proc/uptime").split(" ")[0]),0)
         result += self.fancy_output("Uptime",str(timedelta(seconds=uptime)))
-
-        # separator
-        result += separator()
 
         # volts
         volts = ""
@@ -137,13 +137,26 @@ class mysysinfo:
         cpuinfo = f"load average: {cpucol}{loadavg}%{self.fancy.reset} ({cores} core(s), {self.fancy.green}{freq} MHz{self.fancy.reset}, {self.fancy.green}{temp} °C{self.fancy.reset}{volts})"
         result += self.fancy_output("CPU",cpuinfo)
 
+        # separator
+        result += separator()
+
         # ram
+        tmp = ""
         memory = psutil.virtual_memory() # Convert Bytes to MB (Bytes -> KB -> MB)
-        result += self.storage("Memory",memory.available,memory.total,memory.percent)
+        tmp += self.storage("RAM",memory.available,memory.total,memory.percent)
+        swap = psutil.swap_memory() # Convert Bytes to MB (Bytes -> KB -> MB)
+        tmp += self.storage("Swap",swap.free,swap.total,swap.percent)
+        result += self.fancy_output("Memory",tmp)
+
+        # separator
+        result += separator()
 
         # disk
-        disk = psutil.disk_usage('/') # Convert Bytes to GB (Bytes -> KB -> MB -> GB)
-        result += self.storage("Storage",disk.free,disk.total,disk.percent)
+        tmp = ""
+        for mount in sorted(psutil.disk_partitions(all=False), key=lambda d: d.device):
+            disk = psutil.disk_usage(mount.mountpoint) # Convert Bytes to GB (Bytes -> KB -> MB -> GB)
+            tmp += self.storage(mount.device,disk.free,disk.total,disk.percent)
+        result += self.fancy_output("Storage",tmp)
 
         # separator
         result += separator()
