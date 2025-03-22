@@ -6,7 +6,7 @@ import psutil,time,sys,os
 from datetime import timedelta,datetime
 from textwrap import indent
 from subprocess import check_output,STDOUT,run,PIPE
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 # ANSI colours courtesy of https://replit.com/talk/learn/ANSI-Escape-Codes-in-Python/22803
 # data gathering stuff inspired by:
@@ -228,7 +228,11 @@ class mysysinfo:
 
         return result
 
-class handler(BaseHTTPRequestHandler):
+class handler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        super().end_headers()
+
     def _set_headers(self,ct):
         self.send_response(200)
         self.send_header("Content-type",ct)
@@ -248,6 +252,7 @@ class handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path != "/":
+            super().do_GET()
             return
         ua = self.headers.get("user-agent")
         if "Wget" in ua or "curl" in ua:
